@@ -157,7 +157,11 @@ export function registerBidder(spec) {
 export function newBidder(spec) {
   return Object.assign(new Adapter(spec.code), {
     getSpec: function() {
-      return Object.freeze(spec);
+      try {
+        return Object.freeze(spec);
+      } catch (err) {
+        return spec;
+      }
     },
     registerSyncs,
     callBids: function(bidderRequest, addBidResponse, done, ajax) {
