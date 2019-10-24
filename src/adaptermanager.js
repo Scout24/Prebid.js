@@ -9,6 +9,7 @@ import { config, RANDOM } from 'src/config';
 import includes from 'core-js/library/fn/array/includes';
 import find from 'core-js/library/fn/array/find';
 import { adunitCounter } from './adUnits';
+import { getRefererInfo } from './refererDetection';
 
 var utils = require('./utils.js');
 var CONSTANTS = require('./constants.json');
@@ -166,6 +167,8 @@ exports.makeBidRequests = function(adUnits, auctionStart, auctionId, cbTimeout, 
     bidderCodes = shuffle(bidderCodes);
   }
 
+  const refererInfo = getRefererInfo();
+
   let clientBidderCodes = bidderCodes;
   let clientTestAdapters = [];
   if (_s2sConfig.enabled) {
@@ -195,7 +198,8 @@ exports.makeBidRequests = function(adUnits, auctionStart, auctionId, cbTimeout, 
         bids: getBids({bidderCode, auctionId, bidderRequestId, 'adUnits': adUnitsS2SCopy, labels}),
         auctionStart: auctionStart,
         timeout: _s2sConfig.timeout,
-        src: CONSTANTS.S2S.SRC
+        src: CONSTANTS.S2S.SRC,
+        refererInfo
       };
       if (bidderRequest.bids.length !== 0) {
         bidRequests.push(bidderRequest);
@@ -228,7 +232,8 @@ exports.makeBidRequests = function(adUnits, auctionStart, auctionId, cbTimeout, 
       bidderRequestId,
       bids: getBids({bidderCode, auctionId, bidderRequestId, 'adUnits': adUnitsClientCopy, labels}),
       auctionStart: auctionStart,
-      timeout: cbTimeout
+      timeout: cbTimeout,
+      refererInfo
     };
     const adapter = _bidderRegistry[bidderCode];
     if (!adapter) {
